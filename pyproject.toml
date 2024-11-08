@@ -1,0 +1,64 @@
+[project]
+name = "aoc"
+readme = "README.md"
+requires-python = ">=3.13"
+version = "0.1.0"
+
+dependencies = [
+    "advent-of-code-data>=2.0.2",
+    "rich~=13.9.4",
+    "typer~=0.12.5",
+]
+
+[dependency-groups]
+dev = [
+    "browser-cookie3>=0.19.1",
+    "pyright>=1.1.388",
+    "pytest>=8.3.3",
+    "ruff>=0.7.2",
+]
+
+[project.entry-points]
+"adventofcode.user" = { lishaduck = "aoc.__main__:solve" }
+
+[project.scripts]
+advent = "aoc.__main__:main"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.ruff]
+# https://docs.astral.sh/ruff/configuration/
+preview = true
+target-version = "py313"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+
+ignore = [
+    "COM812",
+    "CPY001",
+    "D",
+    "E203",
+    "E501",
+    "INP001",
+    "ISC001",
+    "PLR2004", # temporary
+    "S101",
+    "S311",
+    "T201",
+    "TD003",
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
