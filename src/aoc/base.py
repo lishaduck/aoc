@@ -4,6 +4,10 @@ from typing import Literal
 type Output = str | int
 
 
+class AOCError(Exception):
+    """Base exception for AoC errors."""
+
+
 class BaseSolution[Parsed](ABC):
     @abstractmethod
     def parse(self, values: str) -> Parsed: ...
