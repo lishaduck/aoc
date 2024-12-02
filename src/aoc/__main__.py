@@ -1,12 +1,14 @@
 import datetime
 import importlib
 from pathlib import Path
+from time import sleep
 from typing import Annotated, Any, cast
 
 import aocd
 import rich
 from rich.progress import Progress, SpinnerColumn, TextColumn
 import typer
+from urllib3.exceptions import MaxRetryError
 
 from aoc.base import BaseSolution
 
@@ -53,7 +55,13 @@ def scaffold(
         transient=True,
     ) as progress:
         download_task = progress.add_task(description="Downloading data...", total=None)
-        data = aocd.get_data(day=day, year=year)
+        try:
+            data = aocd.get_data(day=day, year=year)
+        except MaxRetryError:
+            progress.update(download_task, description="Download failed")
+            sleep(0.5)
+
+            data = ""
         progress.remove_task(task_id=download_task)
 
         progress.add_task(description="Writing data...", total=None)
