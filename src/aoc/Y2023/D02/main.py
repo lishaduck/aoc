@@ -6,7 +6,7 @@ import functools
 import re
 from typing import override
 
-from aoc.base import AOCError, BaseSolution
+from aoc.base import AoCError, StringSolution
 
 
 @dataclass
@@ -41,7 +41,7 @@ def color_of_cube_set(cube_set: str) -> tuple[Color, int]:
     if blue_match is not None:
         return (Color.blue, blue_match.start())
 
-    raise AOCError
+    raise AoCError
 
 
 def total_color(parsed_cube_set: Iterable[tuple[Color, int]], color: Color) -> int:
@@ -51,9 +51,9 @@ def total_color(parsed_cube_set: Iterable[tuple[Color, int]], color: Color) -> i
     return functools.reduce(reducer, parsed_cube_set, 0)
 
 
-class Solution(BaseSolution[list[list[Handful]]]):
+class Solution(StringSolution[list[list[Handful]]]):
     @override
-    def parse(self, values: str) -> list[list[Handful]]:
+    def transform(self, values: str) -> list[list[Handful]]:
         """Convert string into a list of rounds consisting of a list of handfuls."""
 
         return [

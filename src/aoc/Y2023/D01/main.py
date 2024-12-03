@@ -1,13 +1,9 @@
 from typing import override
 
-from aoc.base import BaseSolution
+from aoc.base import LinesSolution
 
 
-class Solution(BaseSolution[list[str]]):
-    @override
-    def parse(self, values: str) -> list[str]:
-        return values.splitlines()
-
+class Solution(LinesSolution):
     @override
     def part1(self, parsed: list[str]) -> int:
         total = 0

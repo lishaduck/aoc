@@ -1,13 +1,9 @@
 from typing import override
 
-from aoc.base import AOCError, BaseSolution
+from aoc.base import AoCError, StringSolution
 
 
-class Solution(BaseSolution[str]):
-    @override
-    def parse(self, values: str) -> str:
-        return values
-
+class Solution(StringSolution):
     @override
     def part1(self, parsed: str) -> int:
         floor = 0
@@ -39,4 +35,4 @@ class Solution(BaseSolution[str]):
             if floor < 0:
                 return i + 1
 
-        raise AOCError
+        raise AoCError

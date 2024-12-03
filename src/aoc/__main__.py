@@ -72,14 +72,10 @@ def scaffold(
         if not main_file.exists():
             main_file.write_text(f"""from typing import override
 
-from aoc.base import BaseSolution
+from aoc.base import LinesSolution
 
 
-class Solution(BaseSolution[str]):
-    @override
-    def parse(self, values: str) -> str:
-        return values
-
+class Solution(LinesSolution):
     @override
     def part1(self, parsed: str) -> int:
         pass
@@ -237,11 +233,12 @@ def coerce_solution(solution: str | int | None) -> None | str:
 def solve(puzzle: Puzzle) -> tuple[str | None, str | None]:
     mod = importlib.import_module(f"aoc.Y{puzzle.year}.D{puzzle.day:0>2}.main")
 
-    solution = cast(BaseSolution[Any], mod.Solution())
+    solution = cast(BaseSolution[Any, Any], mod.Solution())
 
     parsed = solution.parse(puzzle.input_data)
-    part1 = solution.part1(parsed)
-    part2 = solution.part2(parsed)
+    transformed = solution.transform(parsed)
+    part1 = solution.part1(transformed)
+    part2 = solution.part2(transformed)
 
     return (coerce_solution(part1), coerce_solution(part2))
 

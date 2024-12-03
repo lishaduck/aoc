@@ -1,12 +1,12 @@
 from typing import override
 
-from aoc.base import BaseSolution
+from aoc.base import LinesSolution
 
 
-class Solution(BaseSolution[list[list[int]]]):
+class Solution(LinesSolution[list[list[int]]]):
     @override
-    def parse(self, values: str) -> list[list[int]]:
-        return [[int(col) for col in line.split(" ")] for line in values.splitlines()]
+    def transform(self, values: list[str]) -> list[list[int]]:
+        return [[int(col) for col in line.split(" ")] for line in values]
 
     @override
     def part1(self, parsed: list[list[int]]) -> int:

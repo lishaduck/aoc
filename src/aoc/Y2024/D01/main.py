@@ -1,13 +1,13 @@
 import re
 from typing import override
 
-from aoc.base import BaseSolution
+from aoc.base import LinesSolution
 
 
-class Solution(BaseSolution[list[list[int]]]):
+class Solution(LinesSolution[list[list[int]]]):
     @override
-    def parse(self, values: str) -> list[list[int]]:
-        matches: list[list[str]] = [re.findall(r"\d+", x) for x in values.splitlines()]
+    def transform(self, values: list[str]) -> list[list[int]]:
+        matches: list[list[str]] = [re.findall(r"\d+", line) for line in values]
 
         return [[int(num) for num in line] for line in matches]
 
