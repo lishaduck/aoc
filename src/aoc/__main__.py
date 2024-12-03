@@ -115,7 +115,7 @@ def run(
     out_file_a: Path = day_folder / f"{day:0>2}a.out"
     out_file_b: Path = day_folder / f"{day:0>2}b.out"
 
-    puzzle_input = in_file.read_text()
+    puzzle_input = in_file.read_text(encoding="utf-8")
 
     ans1, ans2 = solve(day=day, year=year, data=puzzle_input)
 
