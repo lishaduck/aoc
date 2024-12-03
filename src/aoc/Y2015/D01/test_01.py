@@ -44,8 +44,8 @@ class TestSolution:
     def test_snapshot1(self) -> None:
         out_file: Path = p / "01a.out"
 
-        input_content = in_file.read_text()
-        output_snapshot = out_file.read_text()
+        input_content = in_file.read_text(encoding="utf-8")
+        output_snapshot = out_file.read_text(encoding="utf-8")
 
         answer = self.tested.run(input_content, part=1)
 
@@ -54,8 +54,8 @@ class TestSolution:
     def test_snapshot2(self) -> None:
         out_file: Path = p / "01b.out"
 
-        input_content = in_file.read_text()
-        output_snapshot = out_file.read_text()
+        input_content = in_file.read_text(encoding="utf-8")
+        output_snapshot = out_file.read_text(encoding="utf-8")
 
         answer = self.tested.run(input_content, part=2)
 
