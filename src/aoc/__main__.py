@@ -4,7 +4,7 @@ from pathlib import Path
 from time import sleep
 from typing import Annotated, Any, cast
 
-import aocd
+from aocd.models import Puzzle
 import rich
 from rich.progress import Progress, SpinnerColumn, TextColumn
 import typer
@@ -36,7 +36,7 @@ def scaffold(
     ] = active_day,
     year: Annotated[
         int,
-        typer.Option(show_default=f"{now:%Y}", prompt=""),
+        typer.Option(show_default=f"{now:%Y}"),
     ] = active_year,
 ) -> None:
     year_folder: Path = p / f"Y{year}"
@@ -55,8 +55,9 @@ def scaffold(
         transient=True,
     ) as progress:
         download_task = progress.add_task(description="Downloading data...", total=None)
+        puzzle = Puzzle(year=year, day=day)
         try:
-            data = aocd.get_data(day=day, year=year)
+            data = puzzle.input_data
         except MaxRetryError:
             progress.update(download_task, description="Download failed")
             sleep(0.5)
@@ -88,7 +89,83 @@ class Solution(BaseSolution[str]):
         {"pass" if not is_christmas else "return None"}
 """)
         if not test_file.exists():
-            test_file.write_text('""\n')
+            examples = puzzle.examples
+            has_examples = len(examples) > 0
+
+            example_case = (
+                f"""@pytest.mark.parametrize(
+        ("example", "example_answer"),
+        [{
+                    "".join([
+                        f'''
+            (
+                """{x.input_data}""",
+                {x.answer_a},
+            ),'''
+                        for x in examples + examples
+                    ])
+                }
+        ],
+    )
+    def test_example1(self, example: str, example_answer: int) -> None:
+        answer = self.tested.run(example, part=1)
+        assert answer == example_answer
+"""
+                if has_examples
+                else ""
+            )
+
+            test_file.write_text(f'''from pathlib import Path
+
+import pytest
+
+from aoc.Y{year}.D{day:0>2}.main import Solution
+
+p: Path = Path(__file__).resolve().parent
+
+in_file: Path = p / "{in_file.name}"
+
+
+class TestSolution:
+    tested = Solution()
+
+    {example_case}
+    @pytest.mark.parametrize(
+        ("example", "example_answer"),
+        [
+            (
+                """""",
+                0,
+            ),
+        ],
+    )
+    def test_example2(self, example: str, example_answer: int) -> None:
+        answer = self.tested.run(example, part=2)
+
+        assert answer == example_answer
+
+    @pytest.mark.xfail
+    def test_snapshot1(self) -> None:
+        out_file: Path = p / "{out_file_a.name}"
+
+        input_content = in_file.read_text(encoding="utf-8")
+        output_snapshot = out_file.read_text(encoding="utf-8")
+
+        answer = self.tested.run(input_content, part=1)
+
+        assert str(answer) == output_snapshot
+
+    @pytest.mark.xfail
+    def test_snapshot2(self) -> None:
+        out_file: Path = p / "{out_file_b.name}"
+
+        input_content = in_file.read_text(encoding="utf-8")
+        output_snapshot = out_file.read_text(encoding="utf-8")
+
+        answer = self.tested.run(input_content, part=2)
+
+        assert str(answer) == output_snapshot
+''')
 
         init_year_file.write_text(f'"""AoC problems for {year}."""\n')
         init_day_file.write_text(f'""""Day {day} problem for AoC {year}."""\n')
