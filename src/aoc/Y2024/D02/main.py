@@ -40,9 +40,7 @@ class Solution(LinesSolution[list[list[int]]]):
             last = 0
             mode = True  # True is up
 
-            dampening = 0
-
-            while dampening < len(line):
+            for dampening in range(len(line)):
                 for i, col in enumerate(line[:dampening] + line[dampening + 1 :]):
                     if i == 1:
                         mode = last < col
@@ -54,12 +52,7 @@ class Solution(LinesSolution[list[list[int]]]):
 
                     last = col
                 else:
+                    safe += 1
                     break
-
-                dampening += 1
-                continue
-
-            if dampening != len(line):
-                safe += 1
 
         return safe
