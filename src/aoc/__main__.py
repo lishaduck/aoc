@@ -28,7 +28,7 @@ active_year = now.year if is_december else now.year - 1
 active_day = now.day if is_december else 1
 
 
-@app.command()
+@app.command(help="Scaffold out the next puzzle.")
 def scaffold(
     day: Annotated[
         int,
@@ -175,7 +175,7 @@ class TestSolution:
             out_file_b.touch()
 
 
-@app.command()
+@app.command(help="Run the solver and save snapshots. Do not submit the answer.")
 def run(
     day: Annotated[
         int,
@@ -186,15 +186,14 @@ def run(
         typer.Option(show_default=f"{now:%Y}"),
     ] = active_year,
 ) -> None:
+    puzzle = Puzzle(year=year, day=day)
+
     year_folder: Path = p / f"Y{year}"
     day_folder: Path = year_folder / f"D{day:0>2}"
-    in_file: Path = day_folder / f"{day:0>2}.in"
     out_file_a: Path = day_folder / f"{day:0>2}a.out"
     out_file_b: Path = day_folder / f"{day:0>2}b.out"
 
-    puzzle_input = in_file.read_text(encoding="utf-8")
-
-    ans1, ans2 = solve(day=day, year=year, data=puzzle_input)
+    ans1, ans2 = solve(puzzle)
 
     if ans1 is not None:
         out_file_a.write_text(ans1)
@@ -202,6 +201,27 @@ def run(
         out_file_b.write_text(ans2)
 
     rich.print(f"Part a: {ans1}\nPart b: {ans2}")
+
+
+@app.command(help="Run the solver and submit the answer. Do not save snapshots.")
+def submit(
+    day: Annotated[
+        int,
+        typer.Argument(show_default="Today"),
+    ] = active_day,
+    year: Annotated[
+        int,
+        typer.Option(show_default=f"{now:%Y}"),
+    ] = active_year,
+) -> None:
+    puzzle = Puzzle(year=year, day=day)
+
+    ans1, ans2 = solve(puzzle)
+
+    if ans1 is not None:
+        puzzle.answer_a = ans1
+    if ans2 is not None:
+        puzzle.answer_b = ans2
 
 
 def coerce_solution(solution: str | int | None) -> None | str:
@@ -214,12 +234,12 @@ def coerce_solution(solution: str | int | None) -> None | str:
             return str(solution)
 
 
-def solve(*, year: int, day: int, data: str) -> tuple[str | None, str | None]:
-    mod = importlib.import_module(f"aoc.Y{year}.D{day:0>2}.main")
+def solve(puzzle: Puzzle) -> tuple[str | None, str | None]:
+    mod = importlib.import_module(f"aoc.Y{puzzle.year}.D{puzzle.day:0>2}.main")
 
     solution = cast(BaseSolution[Any], mod.Solution())
 
-    parsed = solution.parse(data)
+    parsed = solution.parse(puzzle.input_data)
     part1 = solution.part1(parsed)
     part2 = solution.part2(parsed)
 
