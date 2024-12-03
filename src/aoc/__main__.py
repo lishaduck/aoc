@@ -10,7 +10,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 import typer
 from urllib3.exceptions import MaxRetryError
 
-from aoc.base import BaseSolution
+from aoc.base import BaseSolution, Output
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -192,9 +192,9 @@ def run(
     ans1, ans2 = solve(puzzle)
 
     if ans1 is not None:
-        out_file_a.write_text(ans1)
+        out_file_a.write_text(str(ans1))
     if ans2 is not None:
-        out_file_b.write_text(ans2)
+        out_file_b.write_text(str(ans2))
 
     rich.print(f"Part a: {ans1}\nPart b: {ans2}")
 
@@ -215,22 +215,12 @@ def submit(
     ans1, ans2 = solve(puzzle)
 
     if ans1 is not None:
-        puzzle.answer_a = ans1
+        puzzle.answer_a = ans1  # pyright: ignore[reportAttributeAccessIssue]
     if ans2 is not None:
-        puzzle.answer_b = ans2
+        puzzle.answer_b = ans2  # pyright: ignore[reportAttributeAccessIssue]
 
 
-def coerce_solution(solution: str | int | None) -> None | str:
-    match solution:
-        case None:
-            return None
-        case str():
-            return solution
-        case int():
-            return str(solution)
-
-
-def solve(puzzle: Puzzle) -> tuple[str | None, str | None]:
+def solve(puzzle: Puzzle) -> tuple[Output | None, Output | None]:
     mod = importlib.import_module(f"aoc.Y{puzzle.year}.D{puzzle.day:0>2}.main")
 
     solution = cast(BaseSolution[Any, Any], mod.Solution())
@@ -240,7 +230,7 @@ def solve(puzzle: Puzzle) -> tuple[str | None, str | None]:
     part1 = solution.part1(transformed)
     part2 = solution.part2(transformed)
 
-    return (coerce_solution(part1), coerce_solution(part2))
+    return (part1, part2)
 
 
 def main() -> None:
