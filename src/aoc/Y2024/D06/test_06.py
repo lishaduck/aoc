@@ -38,8 +38,17 @@ class TestSolution:
         ("example", "example_answer"),
         [
             (
-                """""",
-                0,
+                """....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#..^.....
+........#.
+#.........
+......#...""",
+                6,
             ),
         ],
     )
@@ -48,7 +57,6 @@ class TestSolution:
 
         assert answer == example_answer
 
-    @pytest.mark.xfail
     def test_snapshot1(self) -> None:
         out_file: Path = p / "06a.out"
 

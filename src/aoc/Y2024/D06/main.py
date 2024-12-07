@@ -10,8 +10,10 @@ from aoc.base import LinesSolution
 
 consts = types.SimpleNamespace()
 
-traversed_mark = "X"
-boundary = "#"
+empty_mark = "."
+boundary_mark = "#"
+obstacle_mark = "O"
+blockades = {obstacle_mark, boundary_mark}
 
 
 class Direction(StrEnum):
@@ -20,14 +22,99 @@ class Direction(StrEnum):
     up_mark = "^"
     down_mark = "V"
 
+    def __repr__(self) -> str:
+        return f"'{self}'"
+
+
+directions = set(Direction)
+
+
+class Traversed(StrEnum):
+    vertical = "|"
+    horizontal = "-"
+    both = "+"
+
+    def __repr__(self) -> str:
+        return f"'{self}'"
+
+
+traversed = set(Traversed)
+
 
 def get_pos(parsed: list[list[str]]) -> tuple[int, int, Direction] | None:
     for iline, line in enumerate(parsed):
         for icol, col in enumerate(line):
-            if col in set(Direction):
+            if col in directions:
                 return (icol, iline, col)
 
     return None
+
+
+def walk_path(input_grid: list[list[str]]) -> list[list[str]] | None:
+    grid = [row[:] for row in input_grid]
+
+    turning = False
+
+    while True:
+        pos = get_pos(grid)
+        if pos is None:
+            break
+        x, y, direction = pos
+
+        match direction:
+            case Direction.left_mark:
+                grid[y][x] = Traversed.horizontal if not turning else Traversed.both
+                turning = False
+                if x - 1 >= 0:
+                    if grid[y][x - 1] in blockades:
+                        turning = True
+                        grid[y][x] = Direction.up_mark
+                    elif grid[y][x - 1] in {Traversed.both, Traversed.horizontal}:
+                        rich.print(grid)
+                        return None
+                    else:
+                        grid[y][x - 1] = Direction.left_mark
+
+            case Direction.up_mark:
+                grid[y][x] = Traversed.vertical if not turning else Traversed.both
+                turning = False
+                if y - 1 >= 0:
+                    if grid[y - 1][x] in blockades:
+                        turning = True
+                        grid[y][x] = Direction.right_mark
+                    elif grid[y - 1][x] in {Traversed.both, Traversed.vertical}:
+                        rich.print(grid)
+                        return None
+                    else:
+                        grid[y - 1][x] = Direction.up_mark
+
+            case Direction.right_mark:
+                grid[y][x] = Traversed.horizontal if not turning else Traversed.both
+                turning = False
+                if x + 1 < len(grid[0]):
+                    if grid[y][x + 1] in blockades:
+                        turning = True
+                        grid[y][x] = Direction.down_mark
+                    elif grid[y][x + 1] in {Traversed.both, Traversed.horizontal}:
+                        rich.print(grid)
+                        return None
+                    else:
+                        grid[y][x + 1] = Direction.right_mark
+
+            case Direction.down_mark:
+                grid[y][x] = Traversed.vertical if not turning else Traversed.both
+                turning = False
+                if y + 1 < len(grid):
+                    if grid[y + 1][x] in blockades:
+                        turning = True
+                        grid[y][x] = Direction.left_mark
+                    elif grid[y + 1][x] in {Traversed.both, Traversed.vertical}:
+                        rich.print(grid)
+                        return None
+                    else:
+                        grid[y + 1][x] = Direction.down_mark
+
+    return grid
 
 
 class Solution(LinesSolution[list[list[str]]]):
@@ -37,45 +124,23 @@ class Solution(LinesSolution[list[list[str]]]):
 
     @override
     def part1(self, parsed: list[list[str]]) -> int:
-        grid = parsed
-
-        while True:
-            pos = get_pos(grid)
-            if pos is None:
-                break
-            x, y, direction = pos
-
-            grid[y][x] = traversed_mark
-
-            match direction:
-                case Direction.left_mark:
-                    if x - 1 >= 0:
-                        if grid[y][x - 1] == boundary:
-                            grid[y][x] = Direction.up_mark
-                        else:
-                            grid[y][x - 1] = Direction.left_mark
-                case Direction.up_mark:
-                    if y - 1 >= 0:
-                        if grid[y - 1][x] == boundary:
-                            grid[y][x] = Direction.right_mark
-                        else:
-                            grid[y - 1][x] = Direction.up_mark
-                case Direction.right_mark:
-                    if x + 1 < len(grid):
-                        if grid[y][x + 1] == boundary:
-                            grid[y][x] = Direction.down_mark
-                        else:
-                            grid[y][x + 1] = Direction.right_mark
-                case Direction.down_mark:
-                    if y + 1 < len(grid):
-                        if grid[y + 1][x] == boundary:
-                            grid[y][x] = Direction.left_mark
-                        else:
-                            grid[y + 1][x] = Direction.down_mark
-
-        rich.print(grid)
-        return "".join([y for x in grid for y in x]).count(traversed_mark)
+        grid = walk_path(parsed)
+        assert grid is not None
+        stringified_grid = "".join([y for x in grid for y in x])
+        return sum(stringified_grid.count(mark) for mark in traversed)
 
     @override
     def part2(self, parsed: list[list[str]]) -> int:
-        pass
+        loops = 0
+
+        for y, line in enumerate(parsed):
+            for x, col in enumerate(line):
+                if col == empty_mark:
+                    blocked_grid = [row[:] for row in parsed]
+                    blocked_grid[y][x] = "O"
+                    grid = walk_path(blocked_grid)
+                    stuck_in_loop = grid is None
+                    if stuck_in_loop:
+                        loops += 1
+
+        return loops
