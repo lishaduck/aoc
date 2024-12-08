@@ -36,8 +36,8 @@ class Solution(StringSolution[Transformed]):
         return (parsed_rules, parsed_nums)
 
     @override
-    def part1(self, parsed: Transformed) -> int:
-        rules, updates = parsed
+    def part1(self, transformed: Transformed) -> int:
+        rules, updates = transformed
 
         good_updates: Updates = []
 
@@ -48,5 +48,5 @@ class Solution(StringSolution[Transformed]):
         return sum(x[len(x) // 2] for x in good_updates)
 
     @override
-    def part2(self, parsed: Transformed) -> int:
-        pass
+    def part2(self, transformed: Transformed) -> None:
+        pass  # TODO: solve part 2.

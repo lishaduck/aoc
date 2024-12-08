@@ -73,11 +73,11 @@ class Solution(StringSolution[list[list[Handful]]]):
         ]
 
     @override
-    def part1(self, parsed: list[list[Handful]]) -> int:
-        def has_enough_reducer(acc: bool, new: Handful) -> bool:
+    def part1(self, transformed: list[list[Handful]]) -> int:
+        def has_enough_reducer(acc: bool, new: Handful) -> bool:  # noqa: FBT001
             return acc and new.red > 12 and new.green > 13 and new.blue > 14
 
-        a = [functools.reduce(has_enough_reducer, game, True) for game in parsed]
+        a = [functools.reduce(has_enough_reducer, game, True) for game in transformed]  # noqa: FBT003
 
         total = 0
         for i in range(len(a)):
@@ -86,5 +86,5 @@ class Solution(StringSolution[list[list[Handful]]]):
         return total
 
     @override
-    def part2(self, parsed: list[list[Handful]]) -> int:
-        pass
+    def part2(self, transformed: list[list[Handful]]) -> None:
+        pass  # TODO: solve part 2.

@@ -12,16 +12,16 @@ class Solution(LinesSolution[list[list[int]]]):
         return [[int(num) for num in line] for line in matches]
 
     @override
-    def part1(self, parsed: list[list[int]]) -> int:
-        a = sorted([x[0] for x in parsed])
-        b = sorted([x[1] for x in parsed])
+    def part1(self, transformed: list[list[int]]) -> int:
+        a = sorted([x[0] for x in transformed])
+        b = sorted([x[1] for x in transformed])
 
         return sum(abs(ai - bi) for ai, bi in zip(a, b, strict=True))
 
     @override
-    def part2(self, parsed: list[list[int]]) -> int:
-        a = [x[0] for x in parsed]
-        b = [x[1] for x in parsed]
+    def part2(self, transformed: list[list[int]]) -> int:
+        a = [x[0] for x in transformed]
+        b = [x[1] for x in transformed]
         similar_totals = [ax * b.count(ax) for ax in a]
 
         return sum(similar_totals)
