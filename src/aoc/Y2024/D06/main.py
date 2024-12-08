@@ -41,8 +41,8 @@ class Traversed(StrEnum):
 traversed = set(Traversed)
 
 
-def get_pos(parsed: list[list[str]]) -> tuple[int, int, Direction] | None:
-    for iline, line in enumerate(parsed):
+def get_pos(grid: list[list[str]]) -> tuple[int, int, Direction] | None:
+    for iline, line in enumerate(grid):
         for icol, col in enumerate(line):
             if col in directions:
                 return (icol, iline, col)
@@ -50,7 +50,7 @@ def get_pos(parsed: list[list[str]]) -> tuple[int, int, Direction] | None:
     return None
 
 
-def walk_path(input_grid: list[list[str]]) -> list[list[str]] | None:
+def walk_path(input_grid: list[list[str]]) -> list[list[str]] | None:  # noqa: C901, PLR0912, PLR0915
     grid = [row[:] for row in input_grid]
 
     turning = False
@@ -123,20 +123,20 @@ class Solution(LinesSolution[list[list[str]]]):
         return [list(col) for col in values]
 
     @override
-    def part1(self, parsed: list[list[str]]) -> int:
-        grid = walk_path(parsed)
+    def part1(self, transformed: list[list[str]]) -> int:
+        grid = walk_path(transformed)
         assert grid is not None
         stringified_grid = "".join([y for x in grid for y in x])
         return sum(stringified_grid.count(mark) for mark in traversed)
 
     @override
-    def part2(self, parsed: list[list[str]]) -> int:
+    def part2(self, transformed: list[list[str]]) -> int:
         loops = 0
 
-        for y, line in enumerate(parsed):
+        for y, line in enumerate(transformed):
             for x, col in enumerate(line):
                 if col == empty_mark:
-                    blocked_grid = [row[:] for row in parsed]
+                    blocked_grid = [row[:] for row in transformed]
                     blocked_grid[y][x] = "O"
                     grid = walk_path(blocked_grid)
                     stuck_in_loop = grid is None

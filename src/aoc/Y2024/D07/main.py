@@ -36,9 +36,9 @@ def calibrate(equations: list[str], operations: OpList) -> int:
 
 class Solution(LinesSolution):
     @override
-    def part1(self, parsed: list[str]) -> int:
-        return calibrate(parsed, ops)
+    def part1(self, transformed: list[str]) -> int:
+        return calibrate(transformed, ops)
 
     @override
-    def part2(self, parsed: list[str]) -> int:
-        return calibrate(parsed, ops2)
+    def part2(self, transformed: list[str]) -> int:
+        return calibrate(transformed, ops2)

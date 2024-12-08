@@ -72,17 +72,17 @@ def scaffold(
         if not main_file.exists():
             main_file.write_text(f"""from typing import override
 
-from aoc.base import LinesSolution
+from aoc.base import StringSolution
 
 
-class Solution(LinesSolution):
+class Solution(StringSolution):
     @override
-    def part1(self, parsed: str) -> int:
-        pass
+    def part1(self, transformed: str) -> int:
+        pass # TODO: solve part 1
 
     @override
-    def part2(self, parsed: str) -> int:
-        {"pass" if not is_christmas else "return None"}
+    def part2(self, transformed: str) -> int:
+        {"pass # TODO: solve part 2" if not is_christmas else "return None"}
 """)
         if not test_file.exists():
             examples = puzzle.examples
@@ -98,7 +98,7 @@ class Solution(LinesSolution):
                 """{x.input_data}""",
                 {x.answer_a},
             ),'''
-                        for x in examples + examples
+                        for x in examples
                     ])
                 }
         ],
@@ -126,6 +126,7 @@ class TestSolution:
     tested = Solution()
 
     {example_case}
+    @pytest.mark.xfail
     @pytest.mark.parametrize(
         ("example", "example_answer"),
         [

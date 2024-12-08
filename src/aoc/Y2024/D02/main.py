@@ -9,10 +9,10 @@ class Solution(LinesSolution[list[list[int]]]):
         return [[int(col) for col in line.split(" ")] for line in values]
 
     @override
-    def part1(self, parsed: list[list[int]]) -> int:
+    def part1(self, transformed: list[list[int]]) -> int:
         safe = 0
 
-        for line in parsed:
+        for line in transformed:
             last = 0
             mode = True  # True is up
 
@@ -33,10 +33,10 @@ class Solution(LinesSolution[list[list[int]]]):
         return safe
 
     @override
-    def part2(self, parsed: list[list[int]]) -> int:
+    def part2(self, transformed: list[list[int]]) -> int:
         safe = 0
 
-        for line in parsed:
+        for line in transformed:
             last = 0
             mode = True  # True is up
 

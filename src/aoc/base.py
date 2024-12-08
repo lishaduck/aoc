@@ -16,11 +16,11 @@ class BaseSolution[Parsed, Transformed](ABC):
         return values  # pyright: ignore[reportReturnType]
 
     @abstractmethod
-    def part1(self, parsed: Transformed) -> Output: ...
+    def part1(self, transformed: Transformed, /) -> Output: ...
 
     @abstractmethod
     def part2(
-        self, parsed: Transformed
+        self, transformed: Transformed, /
     ) -> Output | None:  # Christmas day has no Part 2.
         ...
 
