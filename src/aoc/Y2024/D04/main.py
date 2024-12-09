@@ -84,5 +84,44 @@ class Solution(LinesSolution):
         return count
 
     @override
-    def part2(self, transformed: list[str]) -> int:
-        pass  # TODO: solve part 2
+    def part2(self, lines: list[str]) -> int:
+        count = 0
+
+        height = len(lines)
+        width = len(lines[0]) if height > 0 else 0
+
+        for y, line in enumerate(lines):
+            for x, col in enumerate(line):
+                if (
+                    col == "A"  # noqa: PLR0916
+                    and (y > 0 and y < height - 1 and x > 0 and x < width - 1)
+                    and (
+                        (
+                            lines[y - 1][x - 1] == "M"
+                            and lines[y - 1][x + 1] == "S"
+                            and lines[y + 1][x - 1] == "M"
+                            and lines[y + 1][x + 1] == "S"
+                        )
+                        or (
+                            lines[y - 1][x - 1] == "S"
+                            and lines[y - 1][x + 1] == "M"
+                            and lines[y + 1][x - 1] == "S"
+                            and lines[y + 1][x + 1] == "M"
+                        )
+                        or (
+                            lines[y - 1][x - 1] == "M"
+                            and lines[y - 1][x + 1] == "M"
+                            and lines[y + 1][x - 1] == "S"
+                            and lines[y + 1][x + 1] == "S"
+                        )
+                        or (
+                            lines[y - 1][x - 1] == "S"
+                            and lines[y - 1][x + 1] == "S"
+                            and lines[y + 1][x - 1] == "M"
+                            and lines[y + 1][x + 1] == "M"
+                        )
+                    )
+                ):
+                    count += 1
+
+        return count
