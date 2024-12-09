@@ -28,7 +28,7 @@ class Solution(StringSolution[Transformed]):
         rules, nums = values.split("\n\n")
 
         parsed_rules: list[tuple[int, int]] = [
-            cast(tuple[int, int], tuple(int(bound) for bound in rule.split("|"))[:2])
+            cast("tuple[int, int]", tuple(int(bound) for bound in rule.split("|"))[:2])
             for rule in rules.splitlines()
         ]
         parsed_nums = [[int(x) for x in x.split(",")] for x in nums.splitlines()]
