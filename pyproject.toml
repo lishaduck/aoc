@@ -64,3 +64,4 @@ force-sort-within-sections = true
 addopts = [
     "--import-mode=importlib",
 ]
+xfail_strict = true
