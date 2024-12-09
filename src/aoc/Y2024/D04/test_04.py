@@ -34,13 +34,21 @@ MXMXAXMASX""",
         answer = self.tested.run(example, part=1)
         assert answer == example_answer
 
-    @pytest.mark.xfail
     @pytest.mark.parametrize(
         ("example", "example_answer"),
         [
             (
-                """""",
-                0,
+                """MMMSXXMASM
+MSAMXMSMSA
+AMXSXMAAMM
+MSAMASMSMX
+XMASAMXAMM
+XXAMMXXAMA
+SMSMSASXSS
+SAXAMASAAA
+MAMMMXMMMM
+MXMXAXMASX""",
+                9,
             ),
         ],
     )
