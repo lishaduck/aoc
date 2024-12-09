@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import datetime
 import importlib
 from pathlib import Path
 from time import sleep
-from typing import Annotated, Any, cast
+from typing import TYPE_CHECKING, Annotated, Any, cast
 
 from aocd.models import Puzzle
 import rich
@@ -10,7 +12,8 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 import typer
 from urllib3.exceptions import MaxRetryError
 
-from aoc.base import BaseSolution, Output
+if TYPE_CHECKING:
+    from aoc.base import BaseSolution, Output
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -242,7 +245,7 @@ def run(
 def solve(puzzle: Puzzle) -> tuple[Output | None, Output | None]:
     mod = importlib.import_module(f"aoc.Y{puzzle.year}.D{puzzle.day:0>2}.main")
 
-    solution = cast(BaseSolution[Any, Any], mod.Solution())
+    solution = cast("BaseSolution[Any, Any]", mod.Solution())
 
     parsed = solution.parse(puzzle.input_data)
     transformed = solution.transform(parsed)
