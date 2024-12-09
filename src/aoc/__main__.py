@@ -40,7 +40,7 @@ def coercible_to_int(s: str | None) -> bool:
         return True
 
 
-@app.command(help="Scaffold out the next puzzle.")
+@app.command(help="Scaffold out the next puzzle")
 def scaffold(
     day: Annotated[
         int,
@@ -185,7 +185,7 @@ class TestSolution:
             out_file_b.touch()
 
 
-@app.command(help="Run the solver and save snapshots. Do not submit the answer.")
+@app.command(help="Run the solver, save snapshots, submit answers")
 def run(
     day: Annotated[
         int,
@@ -195,43 +195,48 @@ def run(
         int,
         typer.Option(show_default=f"{now:%Y}"),
     ] = active_year,
+    *,
+    write: bool = True,
+    submit: bool = False,
 ) -> None:
-    puzzle = Puzzle(year=year, day=day)
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True,
+    ) as progress:
+        t1 = progress.add_task("Initializing")
+        year_folder: Path = p / f"Y{year}"
+        day_folder: Path = year_folder / f"D{day:0>2}"
+        out_file_a: Path = day_folder / f"{day:0>2}a.out"
+        out_file_b: Path = day_folder / f"{day:0>2}b.out"
+        puzzle = Puzzle(year=year, day=day)
+        progress.remove_task(t1)
 
-    year_folder: Path = p / f"Y{year}"
-    day_folder: Path = year_folder / f"D{day:0>2}"
-    out_file_a: Path = day_folder / f"{day:0>2}a.out"
-    out_file_b: Path = day_folder / f"{day:0>2}b.out"
+        t2 = progress.add_task("Solving")
+        ans1, ans2 = solve(puzzle)
+        rich.print(f"Part a: {ans1}\nPart b: {ans2}")
+        progress.remove_task(t2)
 
-    ans1, ans2 = solve(puzzle)
+        if ans1 is not None:
+            if write:
+                t3 = progress.add_task("Saving 1")
+                out_file_a.write_text(str(ans1))
+                progress.remove_task(t3)
 
-    if ans1 is not None:
-        out_file_a.write_text(str(ans1))
-    if ans2 is not None:
-        out_file_b.write_text(str(ans2))
+            if submit:
+                t4 = progress.add_task("Submitting 1")
+                puzzle.answer_a = ans1  # pyright: ignore[reportAttributeAccessIssue]
+                progress.remove_task(t4)
+        if ans2 is not None:
+            if write:
+                t3 = progress.add_task("Saving 2")
+                out_file_b.write_text(str(ans2))
+                progress.remove_task(t3)
 
-    rich.print(f"Part a: {ans1}\nPart b: {ans2}")
-
-
-@app.command(help="Run the solver and submit the answer. Do not save snapshots.")
-def submit(
-    day: Annotated[
-        int,
-        typer.Argument(show_default="Today"),
-    ] = active_day,
-    year: Annotated[
-        int,
-        typer.Option(show_default=f"{now:%Y}"),
-    ] = active_year,
-) -> None:
-    puzzle = Puzzle(year=year, day=day)
-
-    ans1, ans2 = solve(puzzle)
-
-    if ans1 is not None:
-        puzzle.answer_a = ans1  # pyright: ignore[reportAttributeAccessIssue]
-    if ans2 is not None:
-        puzzle.answer_b = ans2  # pyright: ignore[reportAttributeAccessIssue]
+            if submit:
+                t4 = progress.add_task("Submitting 2")
+                puzzle.answer_b = ans2  # pyright: ignore[reportAttributeAccessIssue]
+                progress.remove_task(t4)
 
 
 def solve(puzzle: Puzzle) -> tuple[Output | None, Output | None]:
