@@ -28,6 +28,18 @@ active_year = now.year if is_december else now.year - 1
 active_day = now.day if is_december else 1
 
 
+def coercible_to_int(s: str | None) -> bool:
+    if s is None:
+        return False
+
+    try:
+        int(s)
+    except ValueError:
+        return False
+    else:
+        return True
+
+
 @app.command(help="Scaffold out the next puzzle.")
 def scaffold(
     day: Annotated[
@@ -63,6 +75,7 @@ def scaffold(
             sleep(0.5)
 
             data = ""
+
         progress.remove_task(task_id=download_task)
 
         progress.add_task(description="Writing data...", total=None)
@@ -96,7 +109,7 @@ class Solution(StringSolution):
                         f'''
             (
                 """{x.input_data}""",
-                {x.answer_a},
+                {f'"{x.answer_a}"' if not coercible_to_int(x.answer_a) else x.answer_a},
             ),'''
                         for x in examples
                     ])
