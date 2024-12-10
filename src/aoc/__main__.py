@@ -242,6 +242,36 @@ def run(
                 progress.remove_task(t4)
 
 
+@app.command(help="Write input file. Useful for fresh clones.")
+def fetch() -> None:
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True,
+    ):
+        for year_folder in p.glob(r"Y????"):
+            year = int(year_folder.name.removeprefix("Y"))
+
+            for day_folder in year_folder.glob(r"D??"):
+                day = int(day_folder.name.removeprefix("D"))
+
+                in_file: Path = day_folder / f"{day:0>2}.in"
+                out_file_a: Path = day_folder / f"{day:0>2}a.out"
+                out_file_b: Path = day_folder / f"{day:0>2}b.out"
+
+                puzzle = Puzzle(year=year, day=day)
+
+                try:
+                    data = puzzle.input_data
+                except MaxRetryError:
+                    data = ""
+
+                in_file.write_text(data)
+                out_file_a.touch()
+                if day != 25:
+                    out_file_b.touch()
+
+
 def solve(puzzle: Puzzle) -> tuple[Output | None, Output | None]:
     mod = importlib.import_module(f"aoc.Y{puzzle.year}.D{puzzle.day:0>2}.main")
 
