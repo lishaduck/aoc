@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Literal, override
+from typing import override
+
+from aocd.types import PuzzlePart
 
 type Output = str | int
 
@@ -24,14 +26,14 @@ class BaseSolution[Parsed, Transformed](ABC):
     ) -> Output | None:  # Christmas day has no Part 2.
         ...
 
-    def run(self, values: str, *, part: Literal[1, 2]) -> Output | None:
+    def run(self, values: str, *, part: PuzzlePart) -> Output | None:
         parsed = self.parse(values)
         transformed = self.transform(parsed)
 
         match part:
-            case 1:
+            case "a":
                 return self.part1(transformed)
-            case 2:
+            case "b":
                 return self.part2(transformed)
 
 

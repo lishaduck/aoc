@@ -4,7 +4,7 @@ import datetime
 import importlib
 from pathlib import Path
 from time import sleep
-from typing import TYPE_CHECKING, Annotated, Any, cast
+from typing import TYPE_CHECKING, Annotated, Any, Literal, cast
 
 from aocd.models import Puzzle
 import rich
@@ -13,6 +13,8 @@ import typer
 from urllib3.exceptions import MaxRetryError
 
 if TYPE_CHECKING:
+    from aocd.types import PuzzlePart
+
     from aoc.base import BaseSolution, Output
 
 app = typer.Typer(no_args_is_help=True)
@@ -43,15 +45,21 @@ def coercible_to_int(s: str | None) -> bool:
         return True
 
 
-@app.command(help="Scaffold out the next puzzle")
+@app.command(help="Scaffold out the next puzzle.")
 def scaffold(
     day: Annotated[
         int,
-        typer.Argument(show_default="Today"),
+        typer.Argument(
+            show_default="Today",
+            help="The day of the problem.",
+        ),
     ] = active_day,
     year: Annotated[
         int,
-        typer.Option(show_default=f"{now:%Y}"),
+        typer.Option(
+            show_default=f"{now:%Y}",
+            help="Which event you’d like to get the problem from.",
+        ),
     ] = active_year,
 ) -> None:
     year_folder: Path = p / f"Y{year}"
@@ -120,7 +128,7 @@ class Solution(StringSolution):
         ],
     )
     def test_example1(self, example: str, example_answer: int) -> None:
-        answer = self.tested.run(example, part=1)
+        answer = self.tested.run(example, part="a")
         assert answer == example_answer
 """
                 if has_examples
@@ -188,19 +196,35 @@ class TestSolution:
             out_file_b.touch()
 
 
-@app.command(help="Run the solver, save snapshots, submit answers")
+@app.command(help="Run the solver, save snapshots, submit answers.")
 def run(
     day: Annotated[
         int,
-        typer.Argument(show_default="Today"),
+        typer.Argument(
+            show_default="Today",
+            help="The day of the problem.",
+        ),
     ] = active_day,
     year: Annotated[
         int,
-        typer.Option(show_default=f"{now:%Y}"),
+        typer.Option(
+            show_default=f"{now:%Y}",
+            help="Which event you’d like to get the problem from.",
+        ),
     ] = active_year,
     *,
-    write: bool = True,
-    submit: bool = False,
+    write: Annotated[
+        bool,
+        typer.Option(
+            help="Should answers be written to the `*.out` files.",
+        ),
+    ] = True,
+    submit: Annotated[
+        bool,
+        typer.Option(
+            help="Should answers get submitted to the AoC servers.",
+        ),
+    ] = False,
 ) -> None:
     with Progress(
         SpinnerColumn(),
@@ -243,16 +267,28 @@ def run(
 
 
 @app.command(help="Write input file. Useful for fresh clones.")
-def fetch() -> None:
+def fetch(
+    *,
+    should_solve: Annotated[
+        bool,
+        typer.Option(
+            "--solve",
+            help="If missing outputs should be calculated as well.",
+        ),
+    ] = False,
+) -> None:
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         transient=True,
-    ):
+    ) as progress:
         for year_folder in p.glob(r"Y????"):
             year = int(year_folder.name.removeprefix("Y"))
 
             for day_folder in year_folder.glob(r"D??"):
+                task_prefix = f"{year_folder.name}/{day_folder.name}"
+
+                t = progress.add_task(f"{task_prefix}: Setting Up")
                 day = int(day_folder.name.removeprefix("D"))
 
                 in_file: Path = day_folder / f"{day:0>2}.in"
@@ -266,21 +302,46 @@ def fetch() -> None:
                 except MaxRetryError:
                     data = ""
 
-                in_file.write_text(data)
-                out_file_a.touch()
-                if day != 25:
+                if should_solve:
+                    progress.update(t, description=f"{task_prefix}: Solving")
+
+                    match (puzzle.answered_a, puzzle.answered_b):
+                        case (False, False):
+                            ans1, ans2 = solve(puzzle)
+                        case (False, True):
+                            ans1, ans2 = (solve(puzzle, part="a")[0], puzzle.answer_b)
+                        case (True, False):
+                            ans1, ans2 = (puzzle.answer_a, solve(puzzle, part="b")[1])
+                        case (True, True):
+                            ans1, ans2 = puzzle.answers
+
+                    progress.update(t, description=f"{task_prefix}: Writing")
+                    in_file.write_text(data)
+                    if ans1 is not None:
+                        out_file_a.write_text(str(ans1))
+                    if ans2 is not None:
+                        out_file_b.write_text(str(ans2))
+                else:
+                    progress.update(t, description=f"{task_prefix}: Writing")
+                    in_file.write_text(data)
+                    out_file_a.touch()
                     out_file_b.touch()
 
+                progress.remove_task(t)
 
-def solve(puzzle: Puzzle) -> tuple[Output | None, Output | None]:
+
+def solve(
+    puzzle: Puzzle,
+    part: Literal["All"] | PuzzlePart = "All",
+) -> tuple[Output | None, Output | None]:
     mod = importlib.import_module(f"aoc.Y{puzzle.year}.D{puzzle.day:0>2}.main")
 
     solution = cast("BaseSolution[Any, Any]", mod.Solution())
 
     parsed = solution.parse(puzzle.input_data)
     transformed = solution.transform(parsed)
-    part1 = solution.part1(transformed)
-    part2 = solution.part2(transformed)
+    part1 = solution.part1(transformed) if part != "b" else None
+    part2 = solution.part2(transformed) if part != "a" else None
 
     return (part1, part2)
 

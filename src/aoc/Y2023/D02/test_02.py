@@ -27,7 +27,7 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green""",
         ],
     )
     def test_example1(self, example: str, example_answer: int) -> None:
-        answer = self.tested.run(example, part=1)
+        answer = self.tested.run(example, part="a")
         assert answer == example_answer
 
     def test_example2(self) -> None:
