@@ -1,12 +1,14 @@
-from collections.abc import Iterable
 from dataclasses import dataclass
 import enum
 from enum import Enum
 import functools
 import re
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from aoc.base import AoCError, StringSolution
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 @dataclass
@@ -22,9 +24,9 @@ class Color(Enum):
     blue = enum.auto()
 
 
-red_regex = re.compile("\\d red")
-green_regex = re.compile("\\d green")
-blue_regex = re.compile("\\d blue")
+red_regex = re.compile(r"\d red")
+green_regex = re.compile(r"\d green")
+blue_regex = re.compile(r"\d blue")
 
 
 def color_of_cube_set(cube_set: str) -> tuple[Color, int]:
@@ -87,4 +89,4 @@ class Solution(StringSolution[list[list[Handful]]]):
 
     @override
     def part2(self, transformed: list[list[Handful]]) -> None:
-        pass  # TODO: solve part 2.
+        pass  # TODO: solve part 2. # noqa: FIX002

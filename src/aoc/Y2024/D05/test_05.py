@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from aocd.utils import coerce
 import pytest
 
 from aoc.Y2024.D05.main import Solution
@@ -102,7 +103,7 @@ class TestSolution:
 
         answer = self.tested.run(input_content, part=1)
 
-        assert str(answer) == output_snapshot
+        assert coerce(answer) == output_snapshot
 
     @pytest.mark.xfail
     def test_snapshot2(self) -> None:
@@ -113,4 +114,4 @@ class TestSolution:
 
         answer = self.tested.run(input_content, part=2)
 
-        assert str(answer) == output_snapshot
+        assert coerce(answer) == output_snapshot

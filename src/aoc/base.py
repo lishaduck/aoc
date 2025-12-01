@@ -20,7 +20,9 @@ class BaseSolution[Parsed, Transformed](ABC):
 
     @abstractmethod
     def part2(
-        self, transformed: Transformed, /
+        self,
+        transformed: Transformed,
+        /,
     ) -> Output | None:  # Christmas day has no Part 2.
         ...
 

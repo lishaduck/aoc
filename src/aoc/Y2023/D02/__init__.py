@@ -1,1 +1,1 @@
-""""Day 2 problem for AoC 2023."""
+"""Day 2 problem for AoC 2023."""

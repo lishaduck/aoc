@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import StrEnum
 import types
 from typing import override
@@ -41,7 +39,7 @@ class Traversed(StrEnum):
 traversed = set(Traversed)
 
 
-def get_pos(grid: list[list[str]]) -> tuple[int, int, Direction] | None:
+def get_pos(grid: list[list[Direction]]) -> tuple[int, int, Direction] | None:
     for iline, line in enumerate(grid):
         for icol, col in enumerate(line):
             if col in directions:
@@ -56,7 +54,7 @@ def walk_path(input_grid: list[list[str]]) -> list[list[str]] | None:  # noqa: C
     turning = False
 
     while True:
-        pos = get_pos(grid)
+        pos = get_pos(grid)  # pyright: ignore[reportArgumentType]
         if pos is None:
             break
         x, y, direction = pos

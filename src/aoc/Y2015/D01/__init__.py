@@ -1,1 +1,1 @@
-""""Day 1 problem for AoC 2015."""
+"""Day 1 problem for AoC 2015."""

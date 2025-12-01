@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from aocd.utils import coerce
 import pytest
 
 from aoc.Y2024.D09.main import Solution
@@ -9,6 +10,7 @@ p: Path = Path(__file__).resolve().parent
 in_file: Path = p / "09.in"
 
 
+# Takes 3 minutes to run, you've been bewarned!
 class TestSolution:
     tested = Solution()
 
@@ -47,7 +49,7 @@ class TestSolution:
 
         answer = self.tested.run(input_content, part=1)
 
-        assert str(answer) == output_snapshot
+        assert coerce(answer) == output_snapshot
 
     def test_snapshot2(self) -> None:
         out_file: Path = p / "09b.out"
@@ -57,4 +59,4 @@ class TestSolution:
 
         answer = self.tested.run(input_content, part=2)
 
-        assert str(answer) == output_snapshot
+        assert coerce(answer) == output_snapshot

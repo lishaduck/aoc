@@ -1,1 +1,1 @@
-""""Day 1 problem for AoC 2024."""
+"""Day 1 problem for AoC 2024."""

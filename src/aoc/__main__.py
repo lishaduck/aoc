@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 import importlib
 from pathlib import Path
@@ -7,6 +5,7 @@ from time import sleep
 from typing import TYPE_CHECKING, Annotated, Any, cast
 
 from aocd.models import Puzzle
+from aocd.utils import coerce
 import rich
 from rich.progress import Progress, SpinnerColumn, TextColumn
 import typer
@@ -86,7 +85,8 @@ def scaffold(
         day_folder.mkdir(parents=True, exist_ok=True)
 
         if not main_file.exists():
-            main_file.write_text(f"""from typing import override
+            main_file.write_text(
+                f"""from typing import override
 
 from aoc.base import StringSolution
 
@@ -99,7 +99,9 @@ class Solution(StringSolution):
     @override
     def part2(self, transformed: str) -> int:
         {"pass # TODO: solve part 2" if not is_christmas else "return None"}
-""")
+""",
+                encoding="utf-8",
+            )
         if not test_file.exists():
             examples = puzzle.examples
             has_examples = len(examples) > 0
@@ -127,8 +129,10 @@ class Solution(StringSolution):
                 else ""
             )
 
-            test_file.write_text(f'''from pathlib import Path
+            test_file.write_text(
+                f'''from pathlib import Path
 
+from aocd.utils import coerce
 import pytest
 
 from aoc.Y{year}.D{day:0>2}.main import Solution
@@ -166,7 +170,7 @@ class TestSolution:
 
         answer = self.tested.run(input_content, part=1)
 
-        assert str(answer) == output_snapshot
+        assert coerce(answer) == output_snapshot
 
     @pytest.mark.xfail
     def test_snapshot2(self) -> None:
@@ -177,12 +181,23 @@ class TestSolution:
 
         answer = self.tested.run(input_content, part=2)
 
-        assert str(answer) == output_snapshot
-''')
+        assert coerce(answer) == output_snapshot
+''',
+                encoding="utf-8",
+            )
 
-        init_year_file.write_text(f'"""AoC problems for {year}."""\n')
-        init_day_file.write_text(f'""""Day {day} problem for AoC {year}."""\n')
-        in_file.write_text(data)
+        init_year_file.write_text(
+            f'"""AoC problems for {year}."""\n',
+            encoding="utf-8",
+        )
+        init_day_file.write_text(
+            f'"""Day {day} problem for AoC {year}."""\n',
+            encoding="utf-8",
+        )
+        in_file.write_text(
+            data,
+            encoding="utf-8",
+        )
         out_file_a.touch()
         if day != 25:
             out_file_b.touch()
@@ -223,22 +238,22 @@ def run(
         if ans1 is not None:
             if write:
                 t3 = progress.add_task("Saving 1")
-                out_file_a.write_text(str(ans1))
+                out_file_a.write_text(coerce(ans1), encoding="utf-8")
                 progress.remove_task(t3)
 
             if submit:
                 t4 = progress.add_task("Submitting 1")
-                puzzle.answer_a = ans1  # pyright: ignore[reportAttributeAccessIssue]
+                puzzle.answer_a = ans1
                 progress.remove_task(t4)
         if ans2 is not None:
             if write:
                 t3 = progress.add_task("Saving 2")
-                out_file_b.write_text(str(ans2))
+                out_file_b.write_text(coerce(ans2), encoding="utf-8")
                 progress.remove_task(t3)
 
             if submit:
                 t4 = progress.add_task("Submitting 2")
-                puzzle.answer_b = ans2  # pyright: ignore[reportAttributeAccessIssue]
+                puzzle.answer_b = ans2
                 progress.remove_task(t4)
 
 
@@ -266,10 +281,12 @@ def fetch() -> None:
                 except MaxRetryError:
                     data = ""
 
-                in_file.write_text(data)
+                in_file.write_text(data, encoding="utf-8")
                 out_file_a.touch()
                 if day != 25:
                     out_file_b.touch()
+
+            sleep(1)
 
 
 def solve(puzzle: Puzzle) -> tuple[Output | None, Output | None]:

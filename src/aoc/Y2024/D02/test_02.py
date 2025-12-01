@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from aocd.utils import coerce
 import pytest
 
 from aoc.Y2024.D02.main import Solution
@@ -59,7 +60,7 @@ class TestSolution:
 
         answer = self.tested.run(input_content, part=1)
 
-        assert str(answer) == output_snapshot
+        assert coerce(answer) == output_snapshot
 
     def test_snapshot2(self) -> None:
         out_file: Path = p / "02b.out"
@@ -69,4 +70,4 @@ class TestSolution:
 
         answer = self.tested.run(input_content, part=2)
 
-        assert str(answer) == output_snapshot
+        assert coerce(answer) == output_snapshot

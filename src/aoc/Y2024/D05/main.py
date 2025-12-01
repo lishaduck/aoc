@@ -49,4 +49,4 @@ class Solution(StringSolution[Transformed]):
 
     @override
     def part2(self, transformed: Transformed) -> None:
-        pass  # TODO: solve part 2.
+        pass  # TODO: solve part 2. # noqa: FIX002
