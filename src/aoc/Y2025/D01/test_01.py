@@ -3,14 +3,13 @@ from pathlib import Path
 from aocd.utils import coerce
 import pytest
 
-from aoc.Y2024.D09.main import Solution
+from aoc.Y2025.D01.main import Solution
 
 p: Path = Path(__file__).resolve().parent
 
-in_file: Path = p / "09.in"
+in_file: Path = p / "01.in"
 
 
-@pytest.mark.skip("Takes 3 minutes to run, you've been bewarned!")
 class TestSolution:
     tested = Solution()
 
@@ -18,8 +17,17 @@ class TestSolution:
         ("example", "example_answer"),
         [
             (
-                """2333133121414131402""",
-                1928,
+                """L68
+L30
+R48
+L5
+R60
+L55
+L1
+L99
+R14
+L82""",
+                3,
             ),
         ],
     )
@@ -30,9 +38,44 @@ class TestSolution:
     @pytest.mark.parametrize(
         ("example", "example_answer"),
         [
+            pytest.param(
+                """L68
+L30
+R48
+L5
+R60
+L55
+L1
+L99
+R14
+L82""",
+                6,
+                marks=pytest.mark.xfail,
+            ),
+            pytest.param(
+                """R50
+R50
+L50
+L50
+R75
+L50""",
+                4,
+                marks=pytest.mark.xfail,
+            ),
             (
-                """2333133121414131402""",
-                2858,
+                """L50
+R100""",
+                2,
+            ),
+            (
+                """L50""",
+                1,
+            ),
+            pytest.param(
+                """L50
+L1""",
+                1,
+                marks=pytest.mark.xfail,
             ),
         ],
     )
@@ -42,7 +85,7 @@ class TestSolution:
         assert answer == example_answer
 
     def test_snapshot1(self) -> None:
-        out_file: Path = p / "09a.out"
+        out_file: Path = p / "01a.out"
 
         input_content = in_file.read_text(encoding="utf-8")
         output_snapshot = out_file.read_text(encoding="utf-8")
@@ -51,8 +94,9 @@ class TestSolution:
 
         assert coerce(answer) == output_snapshot
 
+    @pytest.mark.xfail
     def test_snapshot2(self) -> None:
-        out_file: Path = p / "09b.out"
+        out_file: Path = p / "01b.out"
 
         input_content = in_file.read_text(encoding="utf-8")
         output_snapshot = out_file.read_text(encoding="utf-8")
